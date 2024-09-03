@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo</title>
+    <style>
+        #root {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        table, th, td {
+            margin-top: 30px;
+            border: 1px solid;
+            text-align: center;
+            border-collapse: collapse;
+        }
+        th,td {
+            padding: 5px 30px;
+        }
+        th{
+            font-size: 20px;
+        }
+       
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    let reactRoot = ReactDOM.createRoot(document.getElementById('root'));
+
+    function Todo() {
+        let [todoValue,setTodoValue] = React.useState('');
+        let [todo,setTodo] = React.useState([]);
+        let [currentFilter, setcurrentFilter] = React.useState('all');
+
+        const filteredItems = todo.filter(item => {
+            if (currentFilter === 'completed') {
+                return item.completed;
+            } else if (currentFilter === 'active') {
+                return !item.completed;
+            } else {
+                return true;
+            }
+        });
+
+
+        let handleValue = (e) => {
+            setTodoValue(e.target.value)
+        }
+
+        let handleAddTodo = () => {
+            setTodo([...todo, { id: todo.length, text: todoValue, completed: false }]);
+            console.log(todo);
+            setTodoValue('');
+        }
+        
+        let handleComplete = (index) => {
+            const newTodo = [...todo];
+            newTodo.forEach( ele => {
+                if (ele.id === index) {
+                    ele.completed = true;
+                }
+            });
+            setTodo(newTodo);
+        }
+
+        let handleRemove = (index) => {
+            let deleteIndex = null;
+            const newTodo = [...todo];
+            newTodo.filter( (ele, i) => {
+                if (ele.id === index) {
+                    deleteIndex = i;
+                }
+            });
+            newTodo.splice(deleteIndex, 1);
+            setTodo(newTodo);
+        } 
+
+        
+        return(
+            <>
+            <div>
+                <h1 style={{textAlign: 'center',marginBottom: '50px',fontSize:'40px',color: '#704264'}}>Todo List</h1>
+                <input type="text" 
+                       style={{marginRight: '20px',padding: '5px 15px',fontSize: '18px'}}
+                       onChange={handleValue} value={todoValue} 
+                       placeholder='Add new tasks'/>
+                <button onClick={() => {handleAddTodo(todoValue)}}
+                        style={{padding: '5px 15px',fontSize: '18px',background: 'green',border: 'none',color: 'white'}}>Add Todo</button>
+                <div style={{marginTop: '20px'}}>
+                    <button onClick={() => {setcurrentFilter('all')}} style={{marginRight: '20px',padding:'5px 15px',background: '#F2613F',color: 'white',fontSize: '18px',border: 'none'}}>All Tasks</button>
+                    <button onClick={() => {setcurrentFilter('active')}} style={{marginRight: '20px',padding:'5px 15px',background: '#F2613F',color: 'white',fontSize: '18px',border: 'none'}}>Active Tasks</button>
+                    <button onClick={() => {setcurrentFilter('completed')}} style={{padding:'5px 15px',background: '#F2613F',color: 'white',fontSize: '18px',border: 'none'}}>Completed Tasks</button>
+                </div>
+                
+            </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Mark as completed</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {filteredItems.map((todoItem, index) => (
+                        <tr key={index}>
+                            <td style={{fontSize: '25px'}}>{todoItem.text}</td>
+                            <td>
+                                <input 
+                                    type="checkbox" 
+                                    checked={todoItem.completed} 
+                                    onChange={() => handleComplete(todoItem.id)}
+                                />
+                            </td>
+                            <td>
+                                <button type="button" 
+                                        style={{padding:'5px 20px',background: 'red',color: 'white',fontSize: '15px',border: 'none'}}
+                                        onClick={() => handleRemove(todoItem.id)}>
+                                        Remove</button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            
+            </>
+        )
+    }
+
+    reactRoot.render(<Todo />)
+  </script>
+</html>
